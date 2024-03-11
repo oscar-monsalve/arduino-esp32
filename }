@@ -1,0 +1,139 @@
+// Program to control the sequence of delta-star induction motor start
+
+// Inputs:
+// - Stop button
+// - Right turn button
+// - Left turn button
+
+// Outputs:
+// - KM1 (left turn)
+// - KM2 (right turn)
+// - KM3 (delta conection)
+// - KM4 (star conection)
+
+// Inputs
+const int STOP = 19;
+const int RIGHT_START = 23;
+const int LEFT_START = 18;
+
+// Outputs
+const int KM1 = 32;
+const int KM2 = 33;
+const int KM3 = 34;
+const int KM4 = 35;
+
+// Button states
+int stop_state = 0;
+int right_state = 0;
+int left_state = 0;
+
+bool stopped_system = true;  // checks if the system is stopped to avoid pressing right and left at the same time
+
+void setup() {
+  pinMode(STOP, INPUT);
+  pinMode(RIGHT_START, INPUT);
+  pinMode(LEFT_START, INPUT);
+
+  pinMode(KM1, OUTPUT);
+  pinMode(KM2, OUTPUT);
+  pinMode(KM3, OUTPUT);
+  pinMode(KM4, OUTPUT);
+}
+
+void loop() {
+
+}
+
+
+
+// ________________________________________________________________________________
+
+
+//Pulsadores
+const int PulsadorParo = 33; //Pulsador que detiene el sistema3
+const int PulsadorIzquierda = 32; // Pulsador Giro Izquierda
+const int PulsadorDerecha = 25; // Pulsador Giro Derecha
+
+//Salidas digitales de los relés
+const int KM1 = 26; //Giro Izquierda
+const int KM2 = 27; //Giro derecha
+const int KM3 = 14; //Estrella
+const int KM4 = 12; // Delta
+
+//Variables que guardan el estado de los pulsadores.
+int EstadoPulsadorParo = 0;
+int EstadoPulsadorIzquierda = 0;
+int EstadoPulsadorDerecha = 0;
+
+//Variables que servirán para activar o desactivar la parte del código funcional a los temporizadores.
+bool TemporizadorGiroIzquierda = false;
+bool TemporizadorGiroDerecha = false;
+
+//Marca que indica si el sistema está detenido o no. sirve para anular un giro contrario antes de presionar el pulsador paro.
+bool SistemaDetenido = true;
+
+//Variables que sirven para llamar la variable millis() de otra forma en el código.
+unsigned long previousMillisIzquierda = 0;
+unsigned long previousMillisDerecha = 0;
+
+//Tiempo designado para que se realice el cambio de estrella a delta, según el sentido de giro.
+const unsigned long TiempoEstrellaGiroIzquierda = 2000;
+const unsigned long TiempoEstrellaGiroDerecha = 2000;
+
+
+void setup() {
+    //Pulsadores
+    pinMode(PulsadorParo,INPUT); // pull-up
+    pinMode(PulsadorDerecha,INPUT); // pull-up
+    pinMode(PulsadorIzquierda,INPUT); // pull-up
+
+    //Relés definidos como
+    pinMode(KM1,OUTPUT);
+    pinMode(KM2,OUTPUT);
+    pinMode(KM3,OUTPUT);
+    pinMode(KM4,OUTPUT);
+
+    //Inician los relés inactivos. Recordar que la programación en el módulo indica que HIGH envía 0V y LOW envía 3,3V
+    digitalWrite(KM1,HIGH);
+    digitalWrite(KM2,HIGH);
+    digitalWrite(KM3,HIGH);
+    digitalWrite(KM4,HIGH);
+}
+
+void loop() {
+    Arranque();
+}
+
+void Arranque() {
+    // Lectura del estado de los pulsadores
+    EstadoPulsadorParo = digitalRead(PulsadorParo);
+    EstadoPulsadorIzquierda = digitalRead(PulsadorIzquierda);
+    EstadoPulsadorDerecha = digitalRead(PulsadorDerecha);
+
+    //Inicio de la variable millis(). Guarda el tiempo hasta 50 días y después se reinicia.
+    unsigned long currentMillis = millis();
+
+    // Giro izquierda
+    //Pregunta si el pulsador está presionado (enviando un cero lógico) y evalua condiciones
+    //Pulsador ubicado en la izquierda.
+    if(EstadoPulsadorIzquierda==LOW && TemporizadorGiroDerecha == false && SistemaDetenido == true) {
+        previousMillisIzquierda = currentMillis; //Se igualan ambas variables, para tener la acción de millis()
+        digitalWrite(KM1, HIGH); //Desactiva el giro a la derecha
+        digitalWrite(KM2, LOW); //Activa el giro a la izquierda
+        digitalWrite(KM3, LOW); //Activa la conexión en estrella
+        digitalWrite(KM4, HIGH); //Desactiva la conexión en delta
+        TemporizadorGiroIzquierda = true; //Coloca como verdadera la variable TemporizadorGiroIzquierda, que es la que
+        da apertura al temporizador
+            SistemaDetenido = false; //Marca que evita que se active el giro contrario
+    }
+    if(TemporizadorGiroIzquierda) { //Ejecuta el tiempo designado cuando lee TiempoEstrellaGiroIzquierda = True. Luego realiza las acciones
+            if (currentMillis - previousMillisIzquierda >= TiempoEstrellaGiroIzquierda) { //Representa el temporizador para el cambio de estrella-delta
+                    digitalWrite(KM1, HIGH); //Desactiva el giro a la derecha
+                    digitalWrite(KM2, LOW); //Activa el giro a la izquierda
+                    digitalWrite(KM3, HIGH); //Desactiva la conexión en estrella
+                    digitalWrite(KM4, LOW); //Activa la conexión en delta
+                    TemporizadorGiroIzquierda = false; //Termina el tiempo y se sale de la función
+                }
+        }
+
+}
