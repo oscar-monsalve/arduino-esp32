@@ -12,7 +12,7 @@
 // - KM4 (star conection)
 
 // Inputs (buttons)
-const int PulsadorParo = 33; //Pulsador que detiene el sistema3
+const int PulsadorParo = 33; //Pulsador que detiene el sistema
 const int PulsadorIzquierda = 32; // Pulsador Giro Izquierda
 const int PulsadorDerecha = 25; // Pulsador Giro Derecha
 
