@@ -1,5 +1,5 @@
-#define INPUT_BUTTON 22
-#define OUTPUT_LED 21
+const int INPUT_BUTTON = 22
+const int OUTPUT_LED = 21
 
 void setup() {
   Serial.begin(115200);
