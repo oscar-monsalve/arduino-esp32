@@ -37,17 +37,18 @@ void loop() {
       while (myStepper.distanceToGo() != 0) {
         myStepper.run();
       }
-      currentAngle = targetAngle;
-
       // Keep coils energized to hold position
       myStepper.enableOutputs();
+
+      // currentAngle = targetAngle;  // this line returns the motor to its original position
 
       Serial.print("Moved to angle: ");
       Serial.println(currentAngle);
     } else {
       Serial.println("Invalid input. Enter angle between 0 and 360.");
     }
-    delay(1000);
+
     Serial.println("Enter next angle:");
+    delay(1000);
   }
 }
