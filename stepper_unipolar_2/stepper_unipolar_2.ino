@@ -13,7 +13,7 @@ const int i4 = 11;
 const int stepsPerRevolution = 2048;
 const int rpm = 7;
 
-float currentAngle = 0.0;  // Asume that the motor starts at 0°. Can't be a const because it needs to be reassigned in the loop
+float currentAngle = 0.0;  // Motor starts at 0°. Can't be a constant because it needs to be reassigned in the loop
 
 Stepper myStepper(stepsPerRevolution, i1, i3, i2, i4);
 
@@ -43,10 +43,11 @@ void loop() {
       Serial.println(currentAngle);
       delay(500);
     } else {
-      Serial.println("Invalid angle. Enter a value between 0 and 360.");
+      Serial.println("Invalid angle. Enter an angle between 0 and 360.");
     }
-    delay(500);
+
     Serial.println("Enter next angle to move to:");
+    delay(1000);
   }
 
 }

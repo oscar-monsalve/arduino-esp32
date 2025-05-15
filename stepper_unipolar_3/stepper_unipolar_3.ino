@@ -5,6 +5,7 @@
 
 #include<AccelStepper.h>
 
+// Digital output PWM pins
 const int i1 = 8;
 const int i2 = 9;
 const int i3 = 10;
@@ -13,7 +14,7 @@ const int i4 = 11;
 const int stepsPerRevolution = 2048;
 const int rpm = 7;
 
-float currentAngle = 0.0;  // Asume that the motor starts at 0°. Can't be a const because it needs to be reassigned in the loop
+float currentAngle = 0.0;  // Motor starts at 0°. Can't be a constant because it needs to be reassigned in the loop
 
 AccelStepper myStepper(AccelStepper::FULL4WIRE, i1, i3, i2, i4);
 
@@ -37,15 +38,15 @@ void loop() {
       while (myStepper.distanceToGo() != 0) {
         myStepper.run();
       }
-      // Keep coils energized to hold position
-      myStepper.enableOutputs();
+
+      myStepper.enableOutputs();  // Keep coils energized to hold position
 
       // currentAngle = targetAngle;  // this line returns the motor to its original position
 
       Serial.print("Moved to angle: ");
       Serial.println(currentAngle);
     } else {
-      Serial.println("Invalid input. Enter angle between 0 and 360.");
+      Serial.println("Invalid angle. Enter an angle between 0 and 360.");
     }
 
     Serial.println("Enter next angle:");
