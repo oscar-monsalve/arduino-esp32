@@ -1,3 +1,7 @@
+/*
+ Unipolar stepper motor -> Alternating continuos rotation in both directions (Considered as a "Hello World" program)
+*/
+
 #include <Stepper.h>
 
 const int i1 = 8;
