@@ -2,7 +2,6 @@
 Bipolar NEMA 17 stepper motor "Hello World" -> Continous motion
 */
 
-#include <Stepper.h>
 const int step = 2;
 const int dir = 3;
 
