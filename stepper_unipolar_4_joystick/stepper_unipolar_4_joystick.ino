@@ -1,11 +1,11 @@
-#include<Stepper.h>
+#include <Stepper.h>
 
 // Stepper motor pins and data
 const int IN1 = 8;
 const int IN2 = 9;
 const int IN3 = 10;
 const int IN4 = 11;
-const int STEPS_PER_REV = 2048;  // steps per revolution
+const int STEPS_PER_REV = 2048;
 const int RPM = 10;
 
 // Joystick pins
@@ -14,7 +14,6 @@ const int X_PIN = A0;
 // State variables
 int x_input;
 int y_input;
-int button_state;
 
 Stepper stepper(STEPS_PER_REV, IN1, IN3, IN2, IN4);
 
