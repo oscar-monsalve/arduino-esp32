@@ -10,9 +10,9 @@ void setup() {
 }
 
 /**
- * Send PWM pulses to set and hold the servo position.
- *@param pulse_width Desired pulse width in microseconds.
- *@param hold_time Desired hold time in miliseconds to stop the servo.
+ * Sends PWM pulses to set and hold the servo position.
+ *@param pulse_width: Desired pulse width in microseconds.
+ *@param hold_time: Desired hold time in miliseconds to stop the servo.
 */
 void hold_position(int pulse_width, int hold_time) {
   unsigned long start_time = millis();  // Initialize the start time
