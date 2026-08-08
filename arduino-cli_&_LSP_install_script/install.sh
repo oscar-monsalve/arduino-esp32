@@ -106,6 +106,9 @@ configure_arduino_cli() {
 
     log "Installing Espressif ESP32 Boards"
     arduino-cli core install esp32:esp32
+
+    log "Installing Arduino libraries: Stepper, Servo, and ESP32Servo"
+    arduino-cli lib install Stepper Servo ESP32Servo
 }
 
 configure_serial_permissions() {
@@ -143,6 +146,7 @@ verify_installation() {
     clangd --version | sed -n '1p'
     "${BIN_DIR}/arduino-language-server" -h >/dev/null 2>&1
     arduino-cli core list
+    arduino-cli lib list
     arduino-cli board details -b arduino:avr:mega >/dev/null
     arduino-cli board details -b esp32:esp32:esp32 >/dev/null
 
