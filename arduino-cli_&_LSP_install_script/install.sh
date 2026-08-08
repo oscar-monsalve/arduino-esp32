@@ -7,6 +7,7 @@ ARDUINO_LS_VERSION="${ARDUINO_LS_VERSION:-0.7.7}"
 ESP32_INDEX_URL="https://espressif.github.io/arduino-esp32/package_esp32_index.json"
 BIN_DIR="${HOME}/.local/bin"
 CLI_CONFIG="${HOME}/.arduino15/arduino-cli.yaml"
+ZSH_COMPLETION_DIR="${HOME}/completion_arduino_cli"
 
 log() {
     printf '\n==> %s\n' "$1"
@@ -62,6 +63,20 @@ install_arduino_cli() {
     curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh \
         | BINDIR="${BIN_DIR}" sh -s "${ARDUINO_CLI_VERSION}"
 }
+
+install_arduino_cli_completion() (
+    local completion_file temp_file
+
+    completion_file="${ZSH_COMPLETION_DIR}/_arduino-cli"
+    mkdir -p "${ZSH_COMPLETION_DIR}"
+    temp_file="$(mktemp "${ZSH_COMPLETION_DIR}/.arduino-cli.XXXXXX")"
+    trap 'rm -f "${temp_file}"' EXIT
+
+    log "Generating Arduino CLI Zsh completion in ${completion_file}"
+    arduino-cli completion zsh > "${temp_file}"
+    mv "${temp_file}" "${completion_file}"
+    trap - EXIT
+)
 
 install_arduino_language_server() (
     local platform archive base_url temp_dir
@@ -150,6 +165,10 @@ verify_installation() {
     arduino-cli board details -b arduino:avr:mega >/dev/null
     arduino-cli board details -b esp32:esp32:esp32 >/dev/null
 
+    if command -v zsh >/dev/null 2>&1; then
+        zsh -n "${ZSH_COMPLETION_DIR}/_arduino-cli"
+    fi
+
     if command -v modinfo >/dev/null 2>&1 && modinfo cp210x >/dev/null 2>&1; then
         printf 'Linux CP210x USB-to-serial driver: available\n'
     else
@@ -168,6 +187,7 @@ main() {
     export PATH="${BIN_DIR}:${PATH}"
 
     install_arduino_cli
+    install_arduino_cli_completion
     install_arduino_language_server
     configure_arduino_cli
     configure_serial_permissions
@@ -176,6 +196,7 @@ main() {
     log "Installation complete"
     printf 'Mega 2560 FQBN: arduino:avr:mega\n'
     printf 'ESP32 DevKit32 FQBN: esp32:esp32:esp32\n'
+    printf 'Arduino CLI Zsh completion: %s/_arduino-cli\n' "${ZSH_COMPLETION_DIR}"
     printf 'Connect a board and run: arduino-cli board list\n'
 }
 

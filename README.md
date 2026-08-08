@@ -26,6 +26,7 @@ On an Omarchy or Arch Linux machine, run:
 The script installs and verifies:
 
 - Arduino CLI 1.5.1
+- Arduino CLI Zsh completion in `~/completion_arduino_cli/_arduino-cli`
 - Arduino Language Server 0.7.7
 - clangd, when it is not already installed
 - Arduino AVR Boards, including the Mega 2560
