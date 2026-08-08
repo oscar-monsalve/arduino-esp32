@@ -30,6 +30,7 @@ The script installs and verifies:
 - clangd, when it is not already installed
 - Arduino AVR Boards, including the Mega 2560
 - Espressif ESP32 Boards
+- Stepper, Servo, and ESP32Servo libraries
 - The official Espressif stable package index
 - Serial-port group membership on Arch Linux
 
@@ -129,8 +130,9 @@ sketch must have an attached board for the LSP to build its compilation
 database.
 
 Restart the Arduino LSP after changing a project's attached board. Restart
-Neovim or run `:LspRestart arduino_language_server`. Running `:LspInfo` in an
-`.ino` buffer should show `arduino_language_server` as an attached client.
+Neovim or run `:lsp restart arduino_language_server`. Running
+`:checkhealth vim.lsp` in an `.ino` buffer should show
+`arduino_language_server` as an attached client.
 
 Hardcoding one FQBN in `lsp.lua` remains available as a fallback, but it
 overrides `sketch.yaml` for every Arduino project opened by that Neovim
@@ -249,7 +251,7 @@ Install the board platforms once, then use this process for each project.
    ```
 
 3. Keep both `-fqbn` entries commented in `lsp.lua`, open the primary sketch,
-   and confirm the client with `:LspInfo`:
+   and confirm the client with `:checkhealth vim.lsp`:
 
    ```bash
    nvim ~/Arduino/esp32_blink/esp32_blink.ino
@@ -272,6 +274,12 @@ Install the board platforms once, then use this process for each project.
 
    ```bash
    arduino-cli board attach -b arduino:avr:mega ~/Arduino/esp32_blink
+   ```
+
+   Then run this inside Neovim:
+
+   ```vim
+   :lsp restart arduino_language_server
    ```
 
 For projects that move between computers or USB sockets, keep the FQBN in
@@ -364,16 +372,53 @@ before uploading if the uploader reports that the port is busy.
 
 ## Libraries
 
-Board platforms provide the core APIs. Additional sketch libraries can be
-searched, installed, and listed with:
+List all installed Arduino libraries with:
 
 ```bash
-arduino-cli lib search "library name"
-arduino-cli lib install "Library Name"
 arduino-cli lib list
+```
+
+Search the library index before installing a library:
+
+```bash
+arduino-cli lib search --names Stepper
+arduino-cli lib search --names Servo
+```
+
+Install one or more libraries by their exact index names:
+
+```bash
+arduino-cli lib install Stepper Servo ESP32Servo
+```
+
+Libraries are installed for the current user and are available to all of that
+user's sketches. Include these libraries in source code with:
+
+```cpp
+#include <Stepper.h>
+#include <Servo.h>
+```
+
+The official `Servo` library supports the Mega 2560's AVR architecture but not
+ESP32 boards. For an ESP32 servo project, use the installed `ESP32Servo`
+library and include `<ESP32Servo.h>` instead.
+
+Update the library index and installed libraries with:
+
+```bash
 arduino-cli lib update-index
 arduino-cli lib upgrade
 ```
+
+After installing, removing, or updating a library, restart the Arduino language
+server from inside Neovim 0.12 so it rebuilds the project's compilation data:
+
+```vim
+:lsp restart arduino_language_server
+```
+
+Use `:checkhealth vim.lsp` inside Neovim 0.12 to confirm that
+`arduino_language_server` is attached to the current sketch.
 
 No additional Arduino library is required for basic GPIO, serial, Wi-Fi, or
 Bluetooth support on the ESP32; those APIs are included with `esp32:esp32`.
@@ -405,8 +450,8 @@ Common problems:
 | Port permission denied | Add the user to `uucp,lock`, then log out and back in |
 | ESP32 shown as `Unknown` | Use `/dev/ttyUSB0` and the explicit ESP32 FQBN |
 | ESP32 stuck at `Connecting...` | Hold `BOOT` during connection |
-| Language server uses wrong APIs | Select the matching FQBN in `lsp.lua` and restart Neovim |
-| Language server does not attach | Confirm the matching `folder/folder.ino` sketch layout and run `:LspInfo` |
+| Language server uses wrong APIs | Attach the matching FQBN to the sketch and run `:lsp restart arduino_language_server` |
+| Language server does not attach | Confirm the matching `folder/folder.ino` layout and run `:checkhealth vim.lsp` |
 
 Official references:
 
