@@ -172,7 +172,15 @@ On Arch Linux, fix serial-port permission errors with:
 sudo usermod -aG uucp,lock "$USER"
 ```
 
-Log out and back in before trying the port again.
+Fully log out of the desktop session and log back in, then verify that both
+groups are active:
+
+```bash
+id -nG
+```
+
+Do not use `chmod 666 /dev/ttyUSB0` as a permanent fix. Its permissions reset
+when the device reconnects, and it grants access to every local user.
 
 ## Find board identifiers
 
