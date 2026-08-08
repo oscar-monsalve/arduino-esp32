@@ -84,6 +84,20 @@ mega_blink/
 A file such as `~/Arduino/test.ino` is not a valid standalone sketch. It must
 be `~/Arduino/test/test.ino`.
 
+The sketch may be located anywhere on the filesystem. Its parent directory is
+used as the language-server and Arduino CLI project root. For example, this is
+valid:
+
+```text
+/home/om/personal/coding/arduino-esp32/examples/test/
+`-- test.ino
+```
+
+When opening a brand-new `.ino` path in Neovim, write the file once so it
+exists on disk. The Arduino LSP configuration retries automatically after the
+first write. Using `arduino-cli sketch new <path>` avoids this distinction by
+creating the directory and primary file before Neovim opens them.
+
 Open a sketch in Neovim with:
 
 ```bash
@@ -92,24 +106,35 @@ nvim ~/Arduino/mega_blink/mega_blink.ino
 
 ## Select the board for Neovim LSP
 
-The Arduino language server needs one FQBN when it starts. In
-`~/.config/nvim/lua/om/lazy/lsp.lua`, leave exactly one of these entries
-uncommented:
-
-```lua
-"-fqbn", "arduino:avr:mega",
--- "-fqbn", "esp32:esp32:esp32",
-```
-
-For ESP32 development, use:
+The recommended setup stores the board in each project's `sketch.yaml` instead
+of hardcoding one board globally in Neovim. Remove or comment both `-fqbn`
+entries from the `cmd` table in
+`~/.config/nvim/lua/om/lazy/lsp.lua`:
 
 ```lua
 -- "-fqbn", "arduino:avr:mega",
-"-fqbn", "esp32:esp32:esp32",
+-- "-fqbn", "esp32:esp32:esp32",
 ```
 
-Restart Neovim after switching boards. Running `:LspInfo` in an `.ino` buffer
-should show `arduino_language_server` as an attached client.
+Then attach the appropriate board to each sketch:
+
+```bash
+arduino-cli board attach -b arduino:avr:mega ~/Arduino/mega_blink
+arduino-cli board attach -b esp32:esp32:esp32 ~/Arduino/esp32_blink
+```
+
+This creates a `sketch.yaml` in each project. With no hardcoded `-fqbn`,
+`arduino-language-server` asks Arduino CLI to use that project metadata. Every
+sketch must have an attached board for the LSP to build its compilation
+database.
+
+Restart the Arduino LSP after changing a project's attached board. Restart
+Neovim or run `:LspRestart arduino_language_server`. Running `:LspInfo` in an
+`.ino` buffer should show `arduino_language_server` as an attached client.
+
+Hardcoding one FQBN in `lsp.lua` remains available as a fallback, but it
+overrides `sketch.yaml` for every Arduino project opened by that Neovim
+configuration.
 
 ## Check whether a board is recognized
 
@@ -195,6 +220,55 @@ arduino-cli board attach ~/Arduino/esp32_blink
 
 Using explicit `--fqbn` and `--port` arguments is still useful in scripts
 because it makes the selected target unambiguous.
+
+## Recommended workflow
+
+Install the board platforms once, then use this process for each project.
+
+1. Create the sketch:
+
+   ```bash
+   arduino-cli sketch new ~/Arduino/esp32_blink
+   ```
+
+2. Attach its board and, when known, its current port:
+
+   ```bash
+   arduino-cli board attach \
+     -b esp32:esp32:esp32 \
+     -p /dev/ttyUSB0 \
+     ~/Arduino/esp32_blink
+   ```
+
+3. Keep both `-fqbn` entries commented in `lsp.lua`, open the primary sketch,
+   and confirm the client with `:LspInfo`:
+
+   ```bash
+   nvim ~/Arduino/esp32_blink/esp32_blink.ino
+   ```
+
+4. Compile using the defaults from `sketch.yaml`:
+
+   ```bash
+   arduino-cli compile --warnings all ~/Arduino/esp32_blink
+   ```
+
+5. Upload using the saved FQBN and port:
+
+   ```bash
+   arduino-cli upload ~/Arduino/esp32_blink
+   ```
+
+6. To move the project to another board, attach the new FQBN and restart its
+   LSP client:
+
+   ```bash
+   arduino-cli board attach -b arduino:avr:mega ~/Arduino/esp32_blink
+   ```
+
+For projects that move between computers or USB sockets, keep the FQBN in
+`sketch.yaml` but update the port with another `board attach` command after
+checking `arduino-cli board list`.
 
 ## Compile
 
