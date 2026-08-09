@@ -3,10 +3,10 @@
 Installs the Arduino CLI, Arduino Language Server, clangd, board cores, and libraries on Windows 11.
 
 .EXAMPLE
-powershell -ExecutionPolicy Bypass -File .\scripts\install-arduino-tools.ps1
+powershell -ExecutionPolicy Bypass -File .\arduino-cli-LSP_install_windows\install-arduino-tools.ps1
 
 .EXAMPLE
-pwsh -File .\scripts\install-arduino-tools.ps1 -SkipArduinoPackages
+pwsh -File .\arduino-cli-LSP_install_windows\install-arduino-tools.ps1 -SkipArduinoPackages
 #>
 
 [CmdletBinding()]

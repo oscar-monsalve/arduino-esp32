@@ -43,13 +43,13 @@ Downloaded Arduino CLI and Arduino Language Server archives are checked against 
 From the root of this Neovim configuration, use Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\install-arduino-tools.ps1
+powershell -ExecutionPolicy Bypass -File .\arduino-cli-LSP_install_windows\install-arduino-tools.ps1
 ```
 
 Or use PowerShell 7:
 
 ```powershell
-pwsh -File .\scripts\install-arduino-tools.ps1
+pwsh -File .\arduino-cli-LSP_install_windows\install-arduino-tools.ps1
 ```
 
 The script is idempotent. Running it again updates the pinned executables and confirms that the requested cores and libraries are installed.
@@ -76,13 +76,13 @@ This enables argument completion for Arduino CLI commands, subcommands, and flag
 Skip installation of board cores and Arduino libraries while still installing and verifying the three executables:
 
 ```powershell
-pwsh -File .\scripts\install-arduino-tools.ps1 -SkipArduinoPackages
+pwsh -File .\arduino-cli-LSP_install_windows\install-arduino-tools.ps1 -SkipArduinoPackages
 ```
 
 Override the pinned tool versions:
 
 ```powershell
-pwsh -File .\scripts\install-arduino-tools.ps1 `
+pwsh -File .\arduino-cli-LSP_install_windows\install-arduino-tools.ps1 `
     -ArduinoCliVersion "1.5.1" `
     -ArduinoLanguageServerVersion "0.7.7" `
     -ClangdVersion "22.1.6"
@@ -91,7 +91,7 @@ pwsh -File .\scripts\install-arduino-tools.ps1 `
 Override the installation directory:
 
 ```powershell
-pwsh -File .\scripts\install-arduino-tools.ps1 `
+pwsh -File .\arduino-cli-LSP_install_windows\install-arduino-tools.ps1 `
     -InstallRoot "$env:LOCALAPPDATA\Programs\ArduinoTools"
 ```
 
